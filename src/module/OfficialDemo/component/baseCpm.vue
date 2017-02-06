@@ -31,7 +31,7 @@
 </template>
 
 <script>
-    import $ from 'jquery'
+    // import $ from 'jquery'
     import hljs from 'jspath/libs/highlight.pack.js'
 
     import demoCpm08 from 'components/Base/demoCpm_08'

@@ -10,6 +10,12 @@ module.exports = {
   plugins: [
     'html'
   ],
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true,
+    "jquery": true
+  },  
   // add your custom rules here
   'rules': {
     // allow paren-less arrow functions

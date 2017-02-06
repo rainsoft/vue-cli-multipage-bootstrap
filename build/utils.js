@@ -1,6 +1,7 @@
 var path = require('path')
 var config = require('../config')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
+var glob = require('glob');
 
 exports.assetsPath = function (_path) {
   var assetsSubDirectory = process.env.NODE_ENV === 'production'
@@ -58,4 +59,19 @@ exports.styleLoaders = function (options) {
     })
   }
   return output
+}
+
+exports.getEntries = function (globPath) {
+  var entries = {}
+  /**
+   * 读取src目录,并进行路径裁剪
+   */
+  glob.sync(globPath).forEach(function (entry) {
+    var tmp = entry.split('/').splice(-3)
+    var moduleName = tmp.slice(1, 2).toString().toLowerCase();
+    // ***************end***************
+    entries[moduleName] = entry
+  });
+  // 获取的主入口如下： { main: './src/module/index/main.js', test: './src/module/test/test.js' }
+  return entries;
 }

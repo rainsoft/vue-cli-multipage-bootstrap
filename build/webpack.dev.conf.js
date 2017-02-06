@@ -4,17 +4,17 @@ var merge = require('webpack-merge')
 var utils = require('./utils')
 var baseWebpackConfig = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
-var path = require('path');
-var glob = require('glob');
+var FriendlyErrors = require('friendly-errors-webpack-plugin')
+
 // add hot-reload related code to entry chunks
 Object.keys(baseWebpackConfig.entry).forEach(function (name) {
   baseWebpackConfig.entry[name] = ['./build/dev-client'].concat(baseWebpackConfig.entry[name])
 })
 
 module.exports = merge(baseWebpackConfig, {
-  // module: {
-  //   loaders: utils.styleLoaders({sourceMap: config.dev.cssSourceMap})
-  // },
+  module: {
+    loaders: utils.styleLoaders({sourceMap: config.dev.cssSourceMap})
+  },
   // eval-source-map is faster for development
   devtool: '#eval-source-map',
   plugins: [
@@ -25,38 +25,31 @@ module.exports = merge(baseWebpackConfig, {
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
-    new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js')
     // https://github.com/ampedandwired/html-webpack-plugin
     // new HtmlWebpackPlugin({
     //   filename: 'index.html',
     //   template: 'index.html',
     //   inject: true
-    // })
+    // }),
+    new FriendlyErrors()
   ]
 })
 
-function getEntry(globPath) {
-  var entries = {},
-    basename, tmp, pathname;
-
-  glob.sync(globPath).forEach(function (entry) {
-    basename = path.basename(entry, path.extname(entry));
-    tmp = entry.split('/').splice(-3);
-    pathname = tmp.splice(1, 1).toString().toLowerCase();
-    entries[pathname] = entry;
-  });
-
-  return entries;
-}
-
-var pages = getEntry('./src/module/**/*.html');
+var pages = utils.getEntries('./src/module/*/*.html');
 
 for (var pathname in pages) {
   // 配置生成的html文件，定义路径等
   var conf = {
     filename: pathname + '.html',
     template: pages[pathname], // 模板路径
-    inject: true              // js插入位置
+    inject: true,              // js插入位置
+    // excludeChunks 允许跳过某些chunks, 而chunks告诉插件要引用entry里面的哪几个入口
+    // 如何更好的理解这块呢？举个例子：比如本demo中包含两个模块（index和about），最好的当然是各个模块引入自己所需的js，
+    // 而不是每个页面都引入所有的js，你可以把下面这个excludeChunks去掉，然后npm run build，然后看编译出来的index.html和about.html就知道了
+    // filter：将数据过滤，然后返回符合要求的数据，Object.keys是获取JSON对象中的每个key
+    excludeChunks: Object.keys(pages).filter(item => {
+      return (item != pathname)
+    }) 
   };
   // 需要生成几个html文件，就配置几个HtmlWebpackPlugin对象
   module.exports.plugins.push(new HtmlWebpackPlugin(conf));
