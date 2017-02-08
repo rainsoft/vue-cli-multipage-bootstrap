@@ -11,7 +11,7 @@ var cssSourceMapDev = (env === 'development' && config.dev.cssSourceMap)
 var cssSourceMapProd = (env === 'production' && config.build.productionSourceMap)
 var useCssSourceMap = cssSourceMapDev || cssSourceMapProd
 
-var entries = utils.getEntries('./src/module/*/*.js');
+var entries = utils.getEntries('./src/modules/*/*.js');
 
 module.exports = {
   entry: Object.assign(entries,{

@@ -103,7 +103,7 @@ if (config.build.productionGzip) {
   )
 }
 
-var pages = utils.getEntries('./src/module/*/*.html');
+var pages = utils.getEntries('./src/modules/*/*.html');
 
 for (var pathname in pages) {
   // 配置生成的html文件，定义路径等
